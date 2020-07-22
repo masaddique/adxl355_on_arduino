@@ -42,57 +42,28 @@
 void setup() {
   // put your setup code here, to run once:
   Wire.begin();
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Started");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  /*
-  Serial.println("Accessing");
+  enableAccelerometer();
+  //Serial.println("Accessing");
+  readRTC();
   Wire.beginTransmission(0X1D);
   Wire.write(0X00);
   Wire.endTransmission();
-  Wire.requestFrom(0X1D,0X05);
-  while(Wire.available())
-  {
-    //Serial.println("Some Thing");
-    uint8_t c = Wire.read();
-    printHex(c);
-  }
   Serial.println();
-  Wire.beginTransmission(0X1D);
-  Wire.write(0X2D);
-  Wire.write(0X00);
-  Wire.endTransmission();
-  Serial.println("Reading Temperature");
+  Serial.print("Temperature: ");
   Serial.println(readTemperature());
-  Serial.println();
-  Serial.println("Reading Acceleros");
-  Wire.beginTransmission(0X1D);
-  Wire.write(0X08);
-  Wire.endTransmission();
-  Wire.requestFrom(0X1D,9);
-  int i = 0;
-  while(Wire.available())
-  {
-    //Serial.println("Some Thing");
-    uint8_t c = Wire.read();
-    printHex(c);
-    if (i++==2) {
-      Serial.println();
-      i=0;
-    }
-  }
-  */
-  Serial.println();
   Serial.print(readX());
   Serial.print(",");
   Serial.print(readY());
   Serial.print(",");
   Serial.print(readZ());
-  Serial.println(",");
-  delay(50);
+  Serial.println();
+  //delay(50);
 }
 
 void serialEvent()
@@ -164,6 +135,34 @@ float readZ() {
   return value/0X7FFFF*2.048;
   
 }
+
+void enableAccelerometer() {
+  Wire.beginTransmission(0X1D);
+  Wire.write(0X2D);
+  Wire.write(0X00);
+  Wire.endTransmission();
+}
+
+void readRTC() {
+  Wire.beginTransmission(0X68);
+  Wire.write(0X00);
+  Wire.endTransmission();
+  Wire.requestFrom(0X68, 7);
+  uint8_t c0 = Wire.available()?Wire.read():0;
+  uint8_t c1 = Wire.available()?Wire.read():0;
+  uint8_t c2 = Wire.available()?Wire.read():0;
+  uint8_t c3 = Wire.available()?Wire.read():0;
+  uint8_t c4 = Wire.available()?Wire.read():0;
+  uint8_t c5 = Wire.available()?Wire.read():0;
+  uint8_t c6 = Wire.available()?Wire.read():0;
+  printHex(c2);Serial.print(":");
+  printHex(c1);Serial.print(":");
+  printHex(c0);Serial.print("\t");
+  printHex(c6);Serial.print("/");
+  printHex(c5);Serial.print("/");
+  printHex(c4);
+}
+
 void printHex(uint8_t c) {
   uint8_t lower = c&0X0F;
   uint8_t upper = (c>>4)&0X0F;
