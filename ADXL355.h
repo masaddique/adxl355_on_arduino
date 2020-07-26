@@ -38,19 +38,34 @@
 #define SELF_TEST                0x2E
 #define RESET                    0x2F
 
+#define RANGE_2G 2.048
+#define RANGE_4G 4.096
+#define RANGE_8G 8.192
+
 #include "Arduino.h"
 #include "inttypes.h"
 
 class ADXL355 {
 private:
 	uint8_t DEV_ADDRESS;
+	float range;
 public:
 	ADXL355(uint8_t);
 	float readX();
 	float readY();
 	float readZ();
 	float readTemperature();
+	uint8_t readData();
 	uint8_t enable(uint8_t);
+	uint8_t disable();
+	uint8_t enableFIFO(uint8_t);
+	uint8_t dataReady();
+	float tilt(); //this tilt will be calculated in z axis
+	float roll();
+	float pitch();
+	float x;
+	float y;
+	float z;
 
 };
 
